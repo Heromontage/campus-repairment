@@ -1,0 +1,3 @@
+video_path,image_path,description,asset_type,humidity,temperature,cost,time_days,material
+data/videos/demo_crack.mp4,data/images/demo_crack.jpg,small crack near stairway,wall,75,32,180,1,cement
+data/videos/demo_leak.mp4,data/images/demo_leak.jpg,water leak under sink,pipe,80,28,250,2,pipe_kit
