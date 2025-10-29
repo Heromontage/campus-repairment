@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <h2>Report New Issue</h2>
+  <form method="post" id="newIssueForm" enctype="multipart/form-data">
+    <label>Title<input name="title" required></label>
+    <label>Description<textarea name="description" rows="4" required></textarea></label>
+    <label>Location<input name="location" required></label>
+    <label>Severity
+      <select name="severity">
+        <option value="low">Low</option>
+        <option value="medium" selected>Medium</option>
+        <option value="high">High</option>
+        <option value="critical">Critical</option>
+      </select>
+    </label>
+    <label>Attach Image/Video<input type="file" name="media" accept="image/*,video/*"></label>
+    <button type="submit" class="btn">Submit</button>
+  </form>
+{% endblock %}

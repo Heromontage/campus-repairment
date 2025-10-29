@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <h2>Open Issues</h2>
+  <ul class="issues-list">
+    {% for issue in issues %}
+      <li class="issue">
+        <a href="/issue/{{ issue['id'] }}">#{{issue['id']}} - {{ issue['title'] }}</a>
+        <div class="meta">{{ issue['location'] }} • {{ issue['severity'] }} • {{ issue['created_at'][:10] }}</div>
+      </li>
+    {% else %}
+      <li>No issues yet. Click &quot;Report Issue&quot; to add one.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

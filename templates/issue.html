@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <h2>Issue #{{ issue['id'] }} - {{ issue['title'] }}</h2>
+  <div class="issue-detail">
+    <p><strong>Description:</strong> {{ issue['description'] }}</p>
+    <p><strong>Location:</strong> {{ issue['location'] }}</p>
+    <p><strong>Severity:</strong> {{ issue['severity'] }}</p>
+    <p><strong>Created at:</strong> {{ issue['created_at'] }}</p>
+    <p><strong>Status:</strong> {{ issue['status'] }}</p>
+    {% if issue['media_path'] %}
+      <p><strong>Attached Media:</strong></p>
+      {% if issue['media_path'].endswith(('mp4','mov','avi')) %}
+        <video controls width="400">
+          <source src="/{{ issue['media_path'] }}" type="video/mp4">
+        </video>
+      {% else %}
+        <img src="/{{ issue['media_path'] }}" alt="issue image" style="max-width:400px;border-radius:8px;">
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div id="aiSuggestion">
+    <h3>AI Estimated Fix Time</h3>
+    <div id="aiOutput">Click "Get AI Estimate" to generate a suggestion.</div>
+    <button id="getEstimate" class="btn">Get AI Estimate</button>
+  </div>
+
+  <form action="/resolve/{{ issue['id'] }}" method="post" style="margin-top:1rem;">
+    {% if issue['status'] != 'resolved' %}
+      <button class="btn danger">Mark Resolved</button>
+    {% else %}
+      <em>Issue resolved.</em>
+    {% endif %}
+  </form>
+
+  <script>
+    const issueData = {
+      title: {{ issue['title']|tojson }},
+      description: {{ issue['description']|tojson }},
+      location: {{ issue['location']|tojson }},
+      severity: {{ issue['severity']|tojson }}
+    };
+    document.getElementById('getEstimate').addEventListener('click', async ()=>{
+      const out = document.getElementById('aiOutput');
+      out.textContent = 'Generating...';
+      try{
+        const res = await fetch('/predict', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(issueData)
+        });
+        const json = await res.json();
+        if(json.error){ out.textContent = 'Error: ' + json.error; }
+        else if(json.estimated_days !== undefined){
+          out.innerHTML = `<strong>Estimated days:</strong> ${json.estimated_days}<br>`+
+                          `<strong>Fix by:</strong> ${json.estimated_fix_iso}<br>`+
+                          `<strong>Confidence:</strong> ${json.confidence}<br>`+
+                          `<strong>Rationale:</strong> ${json.rationale}`;
+        } else if(json.raw){ out.textContent = json.raw; }
+        else { out.textContent = JSON.stringify(json); }
+      }catch(err){ out.textContent = 'Request failed: ' + err; }
+    });
+  </script>
+{% endblock %}
